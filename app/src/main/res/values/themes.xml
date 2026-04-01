@@ -1,0 +1,8 @@
+<resources>
+    <style name="Theme.VaultZip" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/vz_page_background</item>
+        <item name="colorPrimary">@color/vz_primary</item>
+        <item name="colorPrimaryVariant">@color/vz_primary_dark</item>
+        <item name="colorSecondary">@color/vz_primary</item>
+    </style>
+</resources>

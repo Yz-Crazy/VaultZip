@@ -1,0 +1,336 @@
+cmake_minimum_required(VERSION 3.22.1)
+
+project("archivekit")
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_C_STANDARD 17)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+
+get_filename_component(REPO_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../../.." ABSOLUTE)
+set(UNRAR_DIR "${REPO_ROOT}/third_party/unrar/unrar")
+set(SEVENZIP_DIR "${REPO_ROOT}/third_party/7zip")
+
+set(UNRAR_SOURCES
+    ${UNRAR_DIR}/dll.cpp
+    ${UNRAR_DIR}/archive.cpp
+    ${UNRAR_DIR}/arcread.cpp
+    ${UNRAR_DIR}/headers.cpp
+    ${UNRAR_DIR}/rawread.cpp
+    ${UNRAR_DIR}/extract.cpp
+    ${UNRAR_DIR}/unpack.cpp
+    ${UNRAR_DIR}/rdwrfn.cpp
+    ${UNRAR_DIR}/volume.cpp
+    ${UNRAR_DIR}/file.cpp
+    ${UNRAR_DIR}/filefn.cpp
+    ${UNRAR_DIR}/filcreat.cpp
+    ${UNRAR_DIR}/filestr.cpp
+    ${UNRAR_DIR}/find.cpp
+    ${UNRAR_DIR}/scantree.cpp
+    ${UNRAR_DIR}/pathfn.cpp
+    ${UNRAR_DIR}/encname.cpp
+    ${UNRAR_DIR}/unicode.cpp
+    ${UNRAR_DIR}/strfn.cpp
+    ${UNRAR_DIR}/strlist.cpp
+    ${UNRAR_DIR}/smallfn.cpp
+    ${UNRAR_DIR}/match.cpp
+    ${UNRAR_DIR}/global.cpp
+    ${UNRAR_DIR}/options.cpp
+    ${UNRAR_DIR}/cmddata.cpp
+    ${UNRAR_DIR}/system.cpp
+    ${UNRAR_DIR}/timefn.cpp
+    ${UNRAR_DIR}/errhnd.cpp
+    ${UNRAR_DIR}/consio.cpp
+    ${UNRAR_DIR}/ui.cpp
+    ${UNRAR_DIR}/resource.cpp
+    ${UNRAR_DIR}/crypt.cpp
+    ${UNRAR_DIR}/crc.cpp
+    ${UNRAR_DIR}/hash.cpp
+    ${UNRAR_DIR}/sha1.cpp
+    ${UNRAR_DIR}/sha256.cpp
+    ${UNRAR_DIR}/blake2s.cpp
+    ${UNRAR_DIR}/rijndael.cpp
+    ${UNRAR_DIR}/secpassword.cpp
+    ${UNRAR_DIR}/getbits.cpp
+    ${UNRAR_DIR}/rarvm.cpp
+    ${UNRAR_DIR}/extinfo.cpp
+    ${UNRAR_DIR}/largepage.cpp
+    ${UNRAR_DIR}/threadpool.cpp
+    ${UNRAR_DIR}/qopen.cpp
+    ${UNRAR_DIR}/rs.cpp
+    ${UNRAR_DIR}/rs16.cpp
+    ${UNRAR_DIR}/recvol.cpp
+)
+
+set(SEVENZIP_CPP_COMMON_SOURCES
+    ${SEVENZIP_DIR}/CPP/Common/MyWindows.cpp
+    ${SEVENZIP_DIR}/CPP/Common/CRC.cpp
+    ${SEVENZIP_DIR}/CPP/Common/CrcReg.cpp
+    ${SEVENZIP_DIR}/CPP/Common/DynLimBuf.cpp
+    ${SEVENZIP_DIR}/CPP/Common/IntToString.cpp
+    ${SEVENZIP_DIR}/CPP/Common/LzFindPrepare.cpp
+    ${SEVENZIP_DIR}/CPP/Common/Md5Reg.cpp
+    ${SEVENZIP_DIR}/CPP/Common/MyMap.cpp
+    ${SEVENZIP_DIR}/CPP/Common/MyString.cpp
+    ${SEVENZIP_DIR}/CPP/Common/MyVector.cpp
+    ${SEVENZIP_DIR}/CPP/Common/MyXml.cpp
+    ${SEVENZIP_DIR}/CPP/Common/NewHandler.cpp
+    ${SEVENZIP_DIR}/CPP/Common/Sha1Prepare.cpp
+    ${SEVENZIP_DIR}/CPP/Common/Sha1Reg.cpp
+    ${SEVENZIP_DIR}/CPP/Common/Sha256Prepare.cpp
+    ${SEVENZIP_DIR}/CPP/Common/Sha256Reg.cpp
+    ${SEVENZIP_DIR}/CPP/Common/Sha3Reg.cpp
+    ${SEVENZIP_DIR}/CPP/Common/Sha512Prepare.cpp
+    ${SEVENZIP_DIR}/CPP/Common/Sha512Reg.cpp
+    ${SEVENZIP_DIR}/CPP/Common/StringConvert.cpp
+    ${SEVENZIP_DIR}/CPP/Common/StringToInt.cpp
+    ${SEVENZIP_DIR}/CPP/Common/UTFConvert.cpp
+    ${SEVENZIP_DIR}/CPP/Common/Wildcard.cpp
+    ${SEVENZIP_DIR}/CPP/Common/Xxh64Reg.cpp
+    ${SEVENZIP_DIR}/CPP/Common/XzCrc64Init.cpp
+    ${SEVENZIP_DIR}/CPP/Common/XzCrc64Reg.cpp
+)
+
+set(SEVENZIP_WINDOWS_SOURCES
+    ${SEVENZIP_DIR}/CPP/Windows/FileDir.cpp
+    ${SEVENZIP_DIR}/CPP/Windows/FileFind.cpp
+    ${SEVENZIP_DIR}/CPP/Windows/FileIO.cpp
+    ${SEVENZIP_DIR}/CPP/Windows/FileName.cpp
+    ${SEVENZIP_DIR}/CPP/Windows/PropVariant.cpp
+    ${SEVENZIP_DIR}/CPP/Windows/PropVariantConv.cpp
+    ${SEVENZIP_DIR}/CPP/Windows/PropVariantUtils.cpp
+    ${SEVENZIP_DIR}/CPP/Windows/System.cpp
+    ${SEVENZIP_DIR}/CPP/Windows/TimeUtils.cpp
+)
+
+set(SEVENZIP_COMMON_SOURCES
+    ${SEVENZIP_DIR}/CPP/7zip/Common/CreateCoder.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Common/CWrappers.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Common/InBuffer.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Common/InOutTempBuffer.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Common/FilterCoder.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Common/LimitedStreams.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Common/LockedStream.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Common/MethodId.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Common/MethodProps.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Common/OffsetStream.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Common/OutBuffer.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Common/ProgressUtils.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Common/PropId.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Common/StreamObjects.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Common/StreamUtils.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Common/UniqBlocks.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Common/FileStreams.cpp
+)
+
+set(SEVENZIP_ARCHIVE_COMMON_SOURCES
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/Common/CoderMixer2.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/Common/DummyOutStream.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/Common/FindSignature.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/Common/InStreamWithCRC.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/Common/ItemNameUtils.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/Common/MultiStream.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/Common/OutStreamWithCRC.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/Common/OutStreamWithSha1.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/Common/HandlerOut.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/Common/ParseProperties.cpp
+)
+
+set(SEVENZIP_ARCHIVE_SOURCES
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/ArchiveExports.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/DllExports2.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/GzHandler.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/DeflateProps.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/7z/7zCompressionMode.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/7z/7zDecode.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/7z/7zEncode.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/7z/7zExtract.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/7z/7zFolderInStream.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/7z/7zHandler.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/7z/7zHandlerOut.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/7z/7zHeader.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/7z/7zIn.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/7z/7zOut.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/7z/7zProperties.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/7z/7zSpecStream.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/7z/7zUpdate.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/7z/7zRegister.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/Tar/TarHandler.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/Tar/TarHandlerOut.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/Tar/TarHeader.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/Tar/TarIn.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/Tar/TarOut.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/Tar/TarUpdate.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/Tar/TarRegister.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/Zip/ZipAddCommon.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/Zip/ZipHandler.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/Zip/ZipHandlerOut.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/Zip/ZipIn.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/Zip/ZipItem.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/Zip/ZipOut.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/Zip/ZipUpdate.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Archive/Zip/ZipRegister.cpp
+)
+
+set(SEVENZIP_COMPRESS_SOURCES
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/Bcj2Coder.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/Bcj2Register.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/BcjCoder.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/BcjRegister.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/BitlDecoder.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/BranchMisc.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/BranchRegister.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/ByteSwap.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/CodecExports.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/BZip2Crc.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/BZip2Decoder.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/BZip2Encoder.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/BZip2Register.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/CopyCoder.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/CopyRegister.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/Deflate64Register.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/DeflateDecoder.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/DeflateEncoder.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/DeflateRegister.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/DeltaFilter.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/ImplodeDecoder.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/LzfseDecoder.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/LzhDecoder.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/Lzma2Decoder.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/Lzma2Encoder.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/Lzma2Register.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/LzmaDecoder.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/LzmaEncoder.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/LzmaRegister.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/LzOutWindow.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/PpmdDecoder.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/PpmdEncoder.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/PpmdRegister.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/PpmdZip.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/ShrinkDecoder.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/XzDecoder.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/XzEncoder.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/ZDecoder.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/ZlibDecoder.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/ZlibEncoder.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Compress/ZstdDecoder.cpp
+)
+
+set(SEVENZIP_CRYPTO_SOURCES
+    ${SEVENZIP_DIR}/CPP/7zip/Crypto/7zAes.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Crypto/7zAesRegister.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Crypto/HmacSha1.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Crypto/HmacSha256.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Crypto/MyAes.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Crypto/MyAesReg.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Crypto/Pbkdf2HmacSha1.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Crypto/RandGen.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Crypto/WzAes.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Crypto/ZipCrypto.cpp
+    ${SEVENZIP_DIR}/CPP/7zip/Crypto/ZipStrong.cpp
+)
+
+set(SEVENZIP_C_SOURCES
+    ${SEVENZIP_DIR}/C/7zBuf2.c
+    ${SEVENZIP_DIR}/C/7zCrc.c
+    ${SEVENZIP_DIR}/C/7zCrcOpt.c
+    ${SEVENZIP_DIR}/C/7zStream.c
+    ${SEVENZIP_DIR}/C/Aes.c
+    ${SEVENZIP_DIR}/C/AesOpt.c
+    ${SEVENZIP_DIR}/C/Alloc.c
+    ${SEVENZIP_DIR}/C/Bcj2.c
+    ${SEVENZIP_DIR}/C/Bcj2Enc.c
+    ${SEVENZIP_DIR}/C/Blake2s.c
+    ${SEVENZIP_DIR}/C/Bra.c
+    ${SEVENZIP_DIR}/C/Bra86.c
+    ${SEVENZIP_DIR}/C/BraIA64.c
+    ${SEVENZIP_DIR}/C/BwtSort.c
+    ${SEVENZIP_DIR}/C/CpuArch.c
+    ${SEVENZIP_DIR}/C/Delta.c
+    ${SEVENZIP_DIR}/C/HuffEnc.c
+    ${SEVENZIP_DIR}/C/LzFind.c
+    ${SEVENZIP_DIR}/C/LzFindOpt.c
+    ${SEVENZIP_DIR}/C/Lzma2Dec.c
+    ${SEVENZIP_DIR}/C/Lzma2DecMt.c
+    ${SEVENZIP_DIR}/C/Lzma2Enc.c
+    ${SEVENZIP_DIR}/C/LzmaDec.c
+    ${SEVENZIP_DIR}/C/LzmaEnc.c
+    ${SEVENZIP_DIR}/C/Md5.c
+    ${SEVENZIP_DIR}/C/MtCoder.c
+    ${SEVENZIP_DIR}/C/MtDec.c
+    ${SEVENZIP_DIR}/C/Ppmd7.c
+    ${SEVENZIP_DIR}/C/Ppmd7Dec.c
+    ${SEVENZIP_DIR}/C/Ppmd7aDec.c
+    ${SEVENZIP_DIR}/C/Ppmd7Enc.c
+    ${SEVENZIP_DIR}/C/Ppmd8.c
+    ${SEVENZIP_DIR}/C/Ppmd8Dec.c
+    ${SEVENZIP_DIR}/C/Ppmd8Enc.c
+    ${SEVENZIP_DIR}/C/Sha1.c
+    ${SEVENZIP_DIR}/C/Sha1Opt.c
+    ${SEVENZIP_DIR}/C/Sha256.c
+    ${SEVENZIP_DIR}/C/Sha256Opt.c
+    ${SEVENZIP_DIR}/C/Sha3.c
+    ${SEVENZIP_DIR}/C/Sha512.c
+    ${SEVENZIP_DIR}/C/Sha512Opt.c
+    ${SEVENZIP_DIR}/C/Sort.c
+    ${SEVENZIP_DIR}/C/SwapBytes.c
+    ${SEVENZIP_DIR}/C/Xxh64.c
+    ${SEVENZIP_DIR}/C/Xz.c
+    ${SEVENZIP_DIR}/C/XzDec.c
+    ${SEVENZIP_DIR}/C/XzEnc.c
+    ${SEVENZIP_DIR}/C/XzIn.c
+    ${SEVENZIP_DIR}/C/XzCrc64.c
+    ${SEVENZIP_DIR}/C/XzCrc64Opt.c
+    ${SEVENZIP_DIR}/C/ZstdDec.c
+)
+
+add_library(
+    archivekit
+    SHARED
+    archivekit_jni.cpp
+    core/ArchiveRouter.cpp
+    jni/JniConverters.cpp
+    jni/JniErrors.cpp
+    ${UNRAR_SOURCES}
+    ${SEVENZIP_CPP_COMMON_SOURCES}
+    ${SEVENZIP_WINDOWS_SOURCES}
+    ${SEVENZIP_COMMON_SOURCES}
+    ${SEVENZIP_ARCHIVE_COMMON_SOURCES}
+    ${SEVENZIP_ARCHIVE_SOURCES}
+    ${SEVENZIP_COMPRESS_SOURCES}
+    ${SEVENZIP_CRYPTO_SOURCES}
+    ${SEVENZIP_C_SOURCES}
+)
+
+target_include_directories(
+    archivekit
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${UNRAR_DIR}
+    ${SEVENZIP_DIR}/CPP
+    ${SEVENZIP_DIR}/C
+)
+
+target_compile_definitions(
+    archivekit
+    PRIVATE
+    RARDLL
+    UNRAR
+    SILENT
+    RAR_SMP
+    _FILE_OFFSET_BITS=64
+    _LARGEFILE_SOURCE
+    Z7_ST
+)
+
+find_library(
+    log-lib
+    log
+)
+
+target_link_libraries(
+    archivekit
+    ${log-lib}
+    atomic
+    m
+)

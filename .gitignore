@@ -1,0 +1,7 @@
+.DS_Store
+.gradle/
+.tmp-gradle/
+local.properties
+app/build/
+app/.cxx/
+third_party/_downloads/
