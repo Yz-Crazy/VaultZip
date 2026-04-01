@@ -2,7 +2,6 @@ package com.vaultzip.ui.main
 
 import com.vaultzip.preview.PreparedPreview
 import com.vaultzip.ui.password.PasswordPromptRequest
-import com.vaultzip.ui.volume.VolumeCandidate
 
 sealed interface MainUiEvent {
     data class ShowPasswordPrompt(
@@ -24,9 +23,5 @@ sealed interface MainUiEvent {
     data class ShowMultiVolumeDetected(
         val formatName: String,
         val partCount: Int
-    ) : MainUiEvent
-
-    data class ShowVolumePicker(
-        val candidates: List<VolumeCandidate>
     ) : MainUiEvent
 }

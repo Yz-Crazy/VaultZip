@@ -2,6 +2,7 @@ package com.vaultzip.storage
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.documentfile.provider.DocumentFile
 import com.vaultzip.ui.volume.VolumeCandidate
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -14,21 +15,36 @@ class DocumentTreeArchiveCandidateScanner @Inject constructor(
 ) : ArchiveCandidateScanner {
 
     override suspend fun scan(treeUri: Uri): List<VolumeCandidate> {
-        val root = DocumentFile.fromTreeUri(context, treeUri) ?: return emptyList()
-        return root.listFiles()
-            .filter { it.isFile && !it.name.isNullOrBlank() }
-            .mapNotNull { file ->
-                val name = file.name.orEmpty()
-                if (looksLikeArchiveOrVolume(name)) {
-                    VolumeCandidate(
-                        displayName = name,
-                        fileUri = file.uri
-                    )
-                } else {
-                    null
+        val root = DocumentFile.fromTreeUri(context, treeUri)
+        if (root == null) {
+            Log.w(TAG, "DocumentFile.fromTreeUri returned null: $treeUri")
+            return emptyList()
+        }
+
+        return runCatching {
+            val files = root.listFiles()
+            Log.d(TAG, "Scanned ${files.size} files from tree uri: $treeUri")
+            files
+                .filter { it.isFile && !it.name.isNullOrBlank() }
+                .mapNotNull { file ->
+                    val name = file.name.orEmpty()
+                    if (looksLikeArchiveOrVolume(name)) {
+                        VolumeCandidate(
+                            displayName = name,
+                            fileUri = file.uri
+                        )
+                    } else {
+                        null
+                    }
                 }
-            }
-            .sortedBy { it.displayName.lowercase() }
+                .sortedBy { it.displayName.lowercase() }
+                .also { candidates ->
+                    Log.d(TAG, "Matched ${candidates.size} archive candidates for tree uri: $treeUri")
+                }
+        }.getOrElse { throwable ->
+            Log.e(TAG, "Failed to scan tree uri: $treeUri", throwable)
+            emptyList()
+        }
     }
 
     private fun looksLikeArchiveOrVolume(name: String): Boolean {
@@ -46,5 +62,9 @@ class DocumentTreeArchiveCandidateScanner @Inject constructor(
             lower.matches(Regex(""".*\.r\d{2}$""")) ||
             lower.matches(Regex(""".*\.z\d{2}$""")) ||
             lower.matches(Regex(""".*\.zip\.\d{3}$"""))
+    }
+
+    companion object {
+        private const val TAG = "ArchiveCandidateScan"
     }
 }

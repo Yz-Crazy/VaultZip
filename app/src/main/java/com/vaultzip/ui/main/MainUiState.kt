@@ -19,5 +19,6 @@ data class MainUiState(
     val errorMessage: String? = null,
     val processedBytes: Long = 0L,
     val totalBytes: Long? = null,
-    val currentEntryName: String? = null
+    val currentEntryName: String? = null,
+    val pendingVolumePicker: PendingVolumePicker? = null
 )

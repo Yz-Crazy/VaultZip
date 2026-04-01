@@ -2,6 +2,7 @@ package com.vaultzip.ui.main
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vaultzip.archive.model.ArchiveEntry
@@ -95,6 +96,7 @@ class MainViewModel @Inject constructor(
 
     fun onDirectorySelected(treeUri: Uri) {
         clearPasswordSession()
+        Log.d(TAG, "Start scanning tree uri: $treeUri")
 
         viewModelScope.launch {
             setLoading(true)
@@ -102,30 +104,45 @@ class MainViewModel @Inject constructor(
                 val candidates = scanArchiveCandidatesUseCase(treeUri)
                 setLoading(false)
                 if (candidates.isEmpty()) {
+                    Log.d(TAG, "No archive candidates found for tree uri: $treeUri")
                     _uiState.value = _uiState.value.copy(
                         selectedTreeUri = treeUri,
-                        errorMessage = "该目录下未发现压缩包或分卷文件"
+                        logMessage = "目录扫描完成，但未发现可用候选文件",
+                        errorMessage = "该目录下未发现压缩包或分卷文件",
+                        pendingVolumePicker = null
                     )
                     return@launch
                 }
 
+                Log.d(TAG, "Found ${candidates.size} archive candidates for tree uri: $treeUri")
                 _uiState.value = _uiState.value.copy(
                     selectedTreeUri = treeUri,
-                    logMessage = "扫描到 ${candidates.size} 个候选文件"
+                    logMessage = "扫描到 ${candidates.size} 个候选文件",
+                    errorMessage = null,
+                    pendingVolumePicker = PendingVolumePicker(
+                        treeUri = treeUri,
+                        candidates = candidates
+                    )
                 )
-                _events.tryEmit(MainUiEvent.ShowVolumePicker(candidates))
             } catch (t: Throwable) {
+                Log.e(TAG, "Scan directory failed for tree uri: $treeUri", t)
                 setLoading(false)
                 _uiState.value = _uiState.value.copy(
-                    errorMessage = t.message ?: "扫描目录失败"
+                    errorMessage = t.message ?: "扫描目录失败",
+                    pendingVolumePicker = null
                 )
             }
         }
     }
 
+    fun onVolumePickerPresented() {
+        _uiState.value = _uiState.value.copy(pendingVolumePicker = null)
+    }
+
     fun onVolumeCandidateSelected(treeUri: Uri, fileUri: Uri, displayName: String) {
         clearPasswordSession()
         archiveSessionKey = buildArchiveSessionKey(fileUri)
+        _uiState.value = _uiState.value.copy(pendingVolumePicker = null)
 
         viewModelScope.launch {
             setLoading(true)
@@ -494,5 +511,9 @@ class MainViewModel @Inject constructor(
     override fun onCleared() {
         clearPasswordSession()
         super.onCleared()
+    }
+
+    companion object {
+        private const val TAG = "MainViewModel"
     }
 }

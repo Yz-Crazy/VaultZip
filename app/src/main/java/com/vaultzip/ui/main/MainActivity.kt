@@ -110,46 +110,52 @@ class MainActivity : AppCompatActivity(), ExtractFragment.Host, CompressFragment
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.events.collect { event ->
-                    when (event) {
-                        is MainUiEvent.ShowPasswordPrompt -> {
-                            if (supportFragmentManager.findFragmentByTag(PasswordPromptDialogFragment.TAG) == null) {
-                                PasswordPromptDialogFragment.newInstance(event.request)
-                                    .show(supportFragmentManager, PasswordPromptDialogFragment.TAG)
+                launch {
+                    viewModel.uiState.collect { state ->
+                        val pendingVolumePicker = state.pendingVolumePicker ?: return@collect
+                        if (supportFragmentManager.findFragmentByTag(VolumePickerDialogFragment.TAG) == null) {
+                            VolumePickerDialogFragment.newInstance(pendingVolumePicker.candidates)
+                                .show(supportFragmentManager, VolumePickerDialogFragment.TAG)
+                        }
+                        viewModel.onVolumePickerPresented()
+                    }
+                }
+
+                launch {
+                    viewModel.events.collect { event ->
+                        when (event) {
+                            is MainUiEvent.ShowPasswordPrompt -> {
+                                if (supportFragmentManager.findFragmentByTag(PasswordPromptDialogFragment.TAG) == null) {
+                                    PasswordPromptDialogFragment.newInstance(event.request)
+                                        .show(supportFragmentManager, PasswordPromptDialogFragment.TAG)
+                                }
                             }
-                        }
 
-                        is MainUiEvent.ShowToast -> {
-                            Toast.makeText(this@MainActivity, event.message, Toast.LENGTH_SHORT).show()
-                        }
+                            is MainUiEvent.ShowToast -> {
+                                Toast.makeText(this@MainActivity, event.message, Toast.LENGTH_SHORT).show()
+                            }
 
-                        is MainUiEvent.OpenPreview -> {
-                            startActivity(PreviewIntentFactory.create(this@MainActivity, event.preview))
-                        }
+                            is MainUiEvent.OpenPreview -> {
+                                startActivity(PreviewIntentFactory.create(this@MainActivity, event.preview))
+                            }
 
-                        is MainUiEvent.ShowMissingParts -> {
-                            AlertDialog.Builder(this@MainActivity)
-                                .setTitle("分卷不完整")
-                                .setMessage(buildString {
-                                    append("缺少以下分卷：\n\n")
-                                    event.missingParts.forEach { append("• $it\n") }
-                                })
-                                .setPositiveButton("知道了", null)
-                                .show()
-                        }
+                            is MainUiEvent.ShowMissingParts -> {
+                                AlertDialog.Builder(this@MainActivity)
+                                    .setTitle("分卷不完整")
+                                    .setMessage(buildString {
+                                        append("缺少以下分卷：\n\n")
+                                        event.missingParts.forEach { append("• $it\n") }
+                                    })
+                                    .setPositiveButton("知道了", null)
+                                    .show()
+                            }
 
-                        is MainUiEvent.ShowMultiVolumeDetected -> {
-                            Toast.makeText(
-                                this@MainActivity,
-                                "已识别 ${event.formatName} 分卷，共 ${event.partCount} 卷",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-
-                        is MainUiEvent.ShowVolumePicker -> {
-                            if (supportFragmentManager.findFragmentByTag(VolumePickerDialogFragment.TAG) == null) {
-                                VolumePickerDialogFragment.newInstance(event.candidates)
-                                    .show(supportFragmentManager, VolumePickerDialogFragment.TAG)
+                            is MainUiEvent.ShowMultiVolumeDetected -> {
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    "已识别 ${event.formatName} 分卷，共 ${event.partCount} 卷",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         }
                     }
